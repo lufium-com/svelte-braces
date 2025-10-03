@@ -12,9 +12,9 @@ npm install svelte-brace
 
 ```svelte
 <script>
-  import { Bracer } from 'svelte-brace';
+	import { Bracer } from 'svelte-brace'
 
-  let name = 'world';
+	let name = 'world'
 </script>
 
 <Bracer template="Hello {name}!" />
@@ -35,29 +35,29 @@ The `Bracer` component allows you to render text content with curly brace expres
 
 ```svelte
 <script lang="ts">
-  import Bracer from '$lib/Bracer.svelte';
+	import Bracer from '$lib/Bracer.svelte'
 
-  const replacers = [
-    {
-      tag: 'name',
-      values: { text: 'Alice' }
-    },
-    {
-      tag: 'date',
-      values: { date: new Date() },
-      snippet: localizedDate
-    },
-    {
-      tag: 'link',
-      values: { url: 'https://svelte.dev' },
-      snippet: ExternalLink
-    }
-  ];
+	const replacers = [
+		{
+			tag: 'name',
+			values: { text: 'Alice' }
+		},
+		{
+			tag: 'date',
+			values: { date: new Date() },
+			snippet: localizedDate
+		},
+		{
+			tag: 'link',
+			values: { url: 'https://svelte.dev' },
+			snippet: ExternalLink
+		}
+	]
 
-  const template = `Hello {name}, today is {date}. Here is a missing tag: {missingTag}.
+	const template = `Hello {name}, today is {date}. Here is a missing tag: {missingTag}.
 This is a new line and a tag with an argument string: {date until}
 And here is a link: {link click here}
-`;
+`
 </script>
 
 <!-- Basic usage -->
@@ -67,7 +67,7 @@ And here is a link: {link click here}
 <!-- custom error snippet -->
 
 {#snippet errorSnippet(message: string)}
-  <span style="color:orange"> custom parse error: {message} </span>
+	<span style="color:orange"> custom parse error: {message} </span>
 {/snippet}
 <Bracer {template} {replacers} {errorSnippet} />
 
@@ -75,18 +75,18 @@ And here is a link: {link click here}
 
 <h2>Custom Text Snippet</h2>
 {#snippet textSnippet(text: string | undefined)}
-  <span style="color:blue">{text}</span>
+	<span style="color:blue">{text}</span>
 {/snippet}
 <Bracer {template} {replacers} {textSnippet} />
 <Bracer template="Count: {count}" />
 
 <!-- Custom replacers -->
- {#snippet localizedDate(tag: string, argument: string | undefined, values: Record<string, any>)}
-  <span style="color:green" class="date"></span>{values?.date && values?.date instanceof Date
-    ? (argument ?? '' + ' ' + values.date.toLocaleDateString())
-    : ''}
+{#snippet localizedDate(tag: string, argument: string | undefined, values: Record<string, any>)}
+	<span style="color:green" class="date"></span>{values?.date && values?.date instanceof Date
+		? (argument ?? '' + ' ' + values.date.toLocaleDateString())
+		: ''}
 {/snippet}
 {#snippet ExternalLink(tag: string, argument: string | undefined, values: Record<string, any>)}
-  <a href={values?.url} target="_blank" rel="noopener noreferrer">{argument ?? values?.url}</a>
+	<a href={values?.url} target="_blank" rel="noopener noreferrer">{argument ?? values?.url}</a>
 {/snippet}
 ```

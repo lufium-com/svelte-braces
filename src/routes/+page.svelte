@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Bracer from '$lib/Bracer.svelte';
+	import Bracer from '$lib/Bracer.svelte'
 
 	const replacers = [
 		{
@@ -16,12 +16,12 @@
 			values: { url: 'https://svelte.dev' },
 			snippet: ExternalLink
 		}
-	];
+	]
 
 	const template = `Hello {name}, today is {date}. Here is a missing tag: {missingTag}.
 This is a new line and a tag with an argument string: {date until}
 And here is a link: {link click here}
-`;
+`
 </script>
 
 <h1>Bracer Demo</h1>
@@ -34,7 +34,7 @@ And here is a link: {link click here}
 	<a href={values?.url} target="_blank" rel="noopener noreferrer">{argument ?? values?.url}</a>
 {/snippet}
 
-<h2>Template Preview </h2>
+<h2>Template Preview</h2>
 <pre>{template}</pre>
 
 <h2>Replacers</h2>

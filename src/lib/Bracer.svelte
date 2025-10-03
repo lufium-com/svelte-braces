@@ -1,6 +1,5 @@
 <script module lang="ts">
-	export {defaultErrorReplacer, defaultTextReplacer};
-
+	export { defaultErrorReplacer, defaultTextReplacer }
 </script>
 
 <script lang="ts">
@@ -15,7 +14,6 @@
 		snippet?: Snippet<[string, string | undefined, Record<string, any>]>
 		values: Record<string, any>
 	}
-
 
 	let {
 		template,
