@@ -1,41 +1,40 @@
 import type { Snippet } from "svelte"
 
 type ParseResultItem = {
-	isTag: boolean
+	isToken: boolean
 	content: string
 	argument?: string
 }
 
 export type ParseResultLine = ParseResultItem[]
 
-export type ReplacerValues = Record<string, never>
+export type ReplacerValues = unknown
 
-export type Replacer = {
-		tag: string
-		snippet?: Snippet<[string, string | undefined, ReplacerValues]>
-		transform?: (value: ReplacerValues) => string
-		values: ReplacerValues
-	}
+export type Values = Record<string, unknown>
 
+export type Schema<T extends Values> = Record<string, {
+		snippet?: Snippet<[string, string | undefined, T]>
+		transform?: (values: T) => string
+}>
 /**
- * Parses a template string containing special tags enclosed in curly braces ({}).
- * Each tag can have a name and an optional argument separated by whitespace.
+ * Parses a template string containing special tokens enclosed in curly braces ({}).
+ * Each token can have a name and an optional argument separated by whitespace.
  *
  * The template is processed line by line, and each line is split into segments of regular text
- * and tags. Tags are identified by matching pairs of curly braces.
+ * and tokens. tokens are identified by matching pairs of curly braces.
  *
  * @param template - The input template string to parse
  * @returns An array of ParseResultLine[], where each line contains an array of parsed segments.
  *          Each segment is an object with:
- *          - isTag: boolean indicating if the segment is a tag
- *          - content: string containing either the text content or tag name
- *          - argument?: optional string containing the tag argument if present
+ *          - isToken: boolean indicating if the segment is a token
+ *          - content: string containing either the text content or token name
+ *          - argument?: optional string containing the token argument if present
  *
  * @example
- * parseTemplate("Hello {tag arg}") returns:
+ * parseTemplate("Hello {token arg}") returns:
  * [[
- *   { isTag: false, content: "Hello " },
- *   { isTag: true, content: "tag", argument: "arg" }
+ *   { isToken: false, content: "Hello " },
+ *   { isToken: true, content: "token", argument: "arg" }
  * ]]
  */
 export function parseTemplate(template: string): ParseResultLine[] {
@@ -51,16 +50,16 @@ export function parseTemplate(template: string): ParseResultLine[] {
 			const openBrace = line.indexOf('{', position)
 
 			if (openBrace === -1) {
-				// No more tags, process remaining text
+				// No more tokens, process remaining text
 				if (position < line.length) {
-					lineResult.push({ isTag: false, content: line.substring(position) })
+					lineResult.push({ isToken: false, content: line.substring(position) })
 				}
 				break
 			}
 
-			// Process text before the tag
+			// Process text before the token
 			if (openBrace > position) {
-				lineResult.push({ isTag: false, content: line.substring(position, openBrace) })
+				lineResult.push({ isToken: false, content: line.substring(position, openBrace) })
 			}
 
 			// Find the closing brace
@@ -68,23 +67,23 @@ export function parseTemplate(template: string): ParseResultLine[] {
 
 			if (closeBrace === -1) {
 				// No closing brace, treat the rest as text
-				lineResult.push({ isTag: false, content: line.substring(position) })
+				lineResult.push({ isToken: false, content: line.substring(position) })
 				break
 			}
 
-			// Extract tag content
-			const tagContent = line.substring(openBrace + 1, closeBrace)
+			// Extract token content
+			const tokenContent = line.substring(openBrace + 1, closeBrace)
 
-			// Split tag name and argument by first whitespace
-			const firstWhitespace = tagContent.search(/\s/)
+			// Split token name and argument by first whitespace
+			const firstWhitespace = tokenContent.search(/\s/)
 
 			if (firstWhitespace === -1) {
-				// No whitespace, entire content is the tag name with empty argument
-				lineResult.push({ isTag: true, content: tagContent })
+				// No whitespace, entire content is the token name with empty argument
+				lineResult.push({ isToken: true, content: tokenContent })
 			} else {
-				const tagName = tagContent.substring(0, firstWhitespace)
-				const argument = tagContent.substring(firstWhitespace + 1)
-				lineResult.push({ isTag: true, content: tagName, argument })
+				const tokenName = tokenContent.substring(0, firstWhitespace)
+				const argument = tokenContent.substring(firstWhitespace + 1)
+				lineResult.push({ isToken: true, content: tokenName, argument })
 			}
 
 			// Move position past the closing brace
@@ -95,36 +94,29 @@ export function parseTemplate(template: string): ParseResultLine[] {
 	return result
 }
 
-export function templateToString(template: string, replacers: Replacer[], delimiter = '\n') {
-		const map = buildReplacerMap(replacers)
+export function templateToString<T extends Values>(template: string, schema: Schema<T>, values: T, delimiter = '\n') {
 		return parseTemplate(template).map((lines)=>
 		lines.map((item)=>{
-			if (item.isTag) {
-				const replacer = map.get(item.content)
-				if (replacer) {
-					if (replacer.transform) {
-						return replacer.transform(replacer.values)
-					} else if (replacer.values?.text) {
-						return replacer.values.text
-					} else {
-						return ''
-					}
-				} else {
-					// should not happen
-					return item.content
+			if (item.isToken) {
+				const token = schema[item.content]
+				if (token === undefined) {
+					// token not found in schema, return as is
+					return `{${item.content}${item.argument ? ' ' + item.argument : ''}}`
 				}
-			} else {
+
+				if (token.transform) {
+						return token.transform(values)
+					} else if (typeof values[item.content] === 'string') {
+						return values[item.content]
+					} else {
+						// actually, this is an error
+						return values[item.content]?.toString()
+					}
+				}
+			 else {
 				// we could also offer a text replacer here, but none for now
 				return item.content
 			}
 		}).join('')).join(delimiter)	
 	}
 
-	export function buildReplacerMap(replacers: Replacer[]): Map<string, Replacer> {
-		// we don't use spread operator because apparently not all implementations support it
-		const map: Map<string, Replacer> = new Map()
-			replacers.forEach((r) => {
-				map.set(r.tag, r)
-			})
-		return map
-	}

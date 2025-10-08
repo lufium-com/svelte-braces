@@ -90,3 +90,10 @@ And here is a link: {link click here}
 	<a href={values?.url} target="_blank" rel="noopener noreferrer">{argument ?? values?.url}</a>
 {/snippet}
 ```
+
+### Full Example
+
+```svelte
+<!--@include:./src/routes/+page.svelte-->
+```
+
