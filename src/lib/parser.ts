@@ -1,10 +1,21 @@
+import type { Snippet } from "svelte"
+
 type ParseResultItem = {
 	isTag: boolean
 	content: string
 	argument?: string
 }
 
-type ParseResultLine = ParseResultItem[]
+export type ParseResultLine = ParseResultItem[]
+
+export type ReplacerValues = Record<string, never>
+
+export type Replacer = {
+		tag: string
+		snippet?: Snippet<[string, string | undefined, ReplacerValues]>
+		transform?: (value: ReplacerValues) => string
+		values: ReplacerValues
+	}
 
 /**
  * Parses a template string containing special tags enclosed in curly braces ({}).
@@ -83,3 +94,37 @@ export function parseTemplate(template: string): ParseResultLine[] {
 	}
 	return result
 }
+
+export function templateToString(template: string, replacers: Replacer[], delimiter = '\n') {
+		const map = buildReplacerMap(replacers)
+		return parseTemplate(template).map((lines)=>
+		lines.map((item)=>{
+			if (item.isTag) {
+				const replacer = map.get(item.content)
+				if (replacer) {
+					if (replacer.transform) {
+						return replacer.transform(replacer.values)
+					} else if (replacer.values?.text) {
+						return replacer.values.text
+					} else {
+						return ''
+					}
+				} else {
+					// should not happen
+					return item.content
+				}
+			} else {
+				// we could also offer a text replacer here, but none for now
+				return item.content
+			}
+		}).join('')).join(delimiter)	
+	}
+
+	export function buildReplacerMap(replacers: Replacer[]): Map<string, Replacer> {
+		// we don't use spread operator because apparently not all implementations support it
+		const map: Map<string, Replacer> = new Map()
+			replacers.forEach((r) => {
+				map.set(r.tag, r)
+			})
+		return map
+	}

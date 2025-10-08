@@ -1,7 +1,8 @@
 <script lang="ts">
 	import Bracer from '$lib/Bracer.svelte'
+	import { templateToString, type Replacer, type ReplacerValues,  } from '$lib/parser.js'
 
-	const replacers = [
+	const replacers: Replacer = [
 		{
 			tag: 'name',
 			values: { text: 'Alice' }
@@ -9,12 +10,19 @@
 		{
 			tag: 'date',
 			values: { date: new Date() },
-			snippet: localizedDate
+			snippet: localizedDate,
+			transform(value: ReplacerValues) {
+				return value?.date instanceof Date ? value.date.toDateString() : ''
+			},
+			
 		},
 		{
 			tag: 'link',
 			values: { url: 'https://svelte.dev' },
-			snippet: ExternalLink
+			snippet: ExternalLink,
+			transform(value: ReplacerValues) {
+				return value?.url ?? ''
+			}
 		}
 	]
 
@@ -54,3 +62,16 @@ And here is a link: {link click here}
 	<span style="color:blue">{text}</span>
 {/snippet}
 <Bracer {template} {replacers} {textSnippet} />
+
+<h2>Raw text</h2>
+<pre>{templateToString(template, replacers)}</pre>
+
+<h2>Numbered lines</h2>
+{#snippet myline(line)}
+	
+{/snippet}
+<ol>
+<Bracer {template} {replacers} lineSnippet= />
+
+</ol>
+<pre>{templateToString(template, replacers)}</pre>
