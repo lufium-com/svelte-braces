@@ -12,6 +12,10 @@
 	"author": "Andrej Vckovski",
 	"organization": "lufium gmbh",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/lufium-com/svelte-runtime-template.git"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run prepack",
