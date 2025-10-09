@@ -1,4 +1,4 @@
-# Svelte Brace
+# Svelte Runtime Template
 
 A lightweight Svelte component for handling tempolates at runtime with curly brace subsitutions in text content.
 
