@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends Values">
-	import { parseTemplate, type ParseResultLine, type Schema, type Values, type ReplacerValues } from './parser.js'
+	import { parseTemplate, type ParseResultLine, type Schema, type Values } from './parser.js'
 	import type { Snippet } from 'svelte'
 
 
@@ -30,12 +30,12 @@
 
 {#snippet singleLine(line: ParseResultLine, lineIndex: number)}
 		{#each line as item, itemIndex}
-			{#if item.isToken}
-				{#if schema[item.content]}
-					{@const token = schema[item.content]}
-					{@const value = values ? values[item.content] : undefined}
+			{#if item.type === 'token'}
+				{#if schema[item.token]}
+					{@const token = schema[item.token]}
+					{@const value = values ? values[item.token] : undefined}
 					{#if token?.snippet}
-						{@render token.snippet(item.content, item.argument, values)}
+						{@render token.snippet(item.token, item.argument, values)}
 					{:else}
 						<!-- if there is no replacer, just add the content of the text value -->
 						{#if values && typeof value === 'string'}
@@ -45,12 +45,14 @@
 						{/if}
 					{/if}
 				{:else if errorSnippet}
-					{@render errorSnippet(item.content + ' not found')}
+					{@render errorSnippet(item.token + ' not found')}
 				{:else}
 					Error replacer component not found. Should never happen.
 				{/if}
-			{:else}
-				{@render textSnippet(item.content)}
+			{:else if item.type === 'text'}
+				{@render textSnippet(item.value)}
+			{:else if item.type === 'error'}
+				{@render errorSnippet(item.message)}
 			{/if}
 		{/each}
 {/snippet}
