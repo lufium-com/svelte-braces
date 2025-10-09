@@ -4,6 +4,10 @@ A lightweight Svelte component for handling tempolates at runtime with curly bra
 
 This is useful if you have user generated templates that you want to use, e.g., for e-mail sending or html rendering using Svelte components.
 
+## Demo
+
+Check out the [live demo](https://runtime-template-demo.netlify.app) to see the component in action.
+
 ## Installation
 
 ```sh

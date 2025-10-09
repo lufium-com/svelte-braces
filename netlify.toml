@@ -1,0 +1,11 @@
+[build]
+  base = ""
+  command = "npm run build"
+  publish = "build"
+
+# For SvelteKit routing
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/render"
+  status = 200
+
