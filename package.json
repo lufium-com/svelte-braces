@@ -1,6 +1,16 @@
 {
 	"name": "svelte-runtime-template",
 	"version": "0.0.2",
+	"keywords": [
+    "typescript",
+    "template",
+    "parser",
+    "svelte",
+		"runtime",
+    "utility"
+  ],
+  "author": "Andrej Vckovski",
+	"organization": "lufium gmbh",
 	"license": "MIT",
 	"scripts": {
 		"dev": "vite dev",
@@ -60,9 +70,6 @@
 		"vitest": "^3.2.3",
 		"vitest-browser-svelte": "^0.1.0"
 	},
-	"keywords": [
-		"svelte"
-	],
 	"pnpm": {
 		"onlyBuiltDependencies": [
 			"esbuild"

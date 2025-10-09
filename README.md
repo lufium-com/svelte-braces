@@ -66,6 +66,8 @@ Interpolates a template  into a string. Useful to build a plain text representat
 
 ## Examples
 
+### Basic Usage
+
 ```svelte
 <script lang="ts">
   import { TemplateRenderer } from 'svelte-runtime-template'
@@ -129,4 +131,29 @@ And here is a link: {link click here}
 <Bracer template="Count: {count}" />
 
 
+```
+
+### Server-side rendering (e.g., for e-mails)
+
+From the example `page.server.ts`:
+
+```TypeScript
+import { templateToString } from '$lib/parser.js'
+import type { Actions } from '@sveltejs/kit'
+import Sample, { schema, type MyValues } from './Sample.svelte'
+import { render } from 'svelte/server'
+
+export const actions: Actions = {
+  default: async ({ request }) => {
+    const formData = await request.formData()
+    const template = formData.get('template') as string
+    const values = JSON.parse(formData.get('values') as string) as MyValues
+    // Convert date string to Date object
+    values.date = new Date(values.date)
+    const text = templateToString(template as string, schema, values)
+    const renderResult = render(Sample, { props: { template, values } })
+    const html = `<html><head>${renderResult.head}</head><body>${renderResult.body}</body></html>`
+    return { text, html, success: true }
+  }
+}
 ```
