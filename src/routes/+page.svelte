@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
 	import TemplateRenderer from '$lib/TemplateRenderer.svelte'
-	import { templateToString, type Schema, type Values } from '$lib/parser.js'
+	import { templateToString, validateTemplate, type Schema, type Values } from '$lib/parser.js'
 	import type { ActionData } from './$types.js'
 	import Sample, { type MyValues, schema } from './Sample.svelte'
 
@@ -20,10 +20,11 @@ And here is a link: {link click here})
 
 	const Template = TemplateRenderer<typeof values>
 
-	let foo=$state('foo')
+	let validationErrors = $derived(validateTemplate(template, schema))
+
 </script>
 
-<h1>TemplateRenderer Demo {foo}</h1>
+<h1>TemplateRenderer Demo</h1>
 {#snippet localizedDate(token: string, argument: string | undefined, values: MyValues)}
 	<span style="color:green" class="date"></span>{values.date instanceof Date
 		? (argument ?? '' + ' ' + values.date.toLocaleDateString())
@@ -50,6 +51,16 @@ And here is a link: {link click here})
 <h2>Result</h2>
 <Sample {template} {values} />
 
+<h2>Validation</h2>
+{#if validationErrors.length > 0}
+	{#each validationErrors as error}
+		<div style="color:red">
+			{error.message} (line {error.line}, position {error.position})
+		</div>
+	{/each}
+{:else}
+	<div style="color:green">No validation errors found.</div>
+{/if}
 <h2>Custom Error Snippet</h2>
 {#snippet errorSnippet(message: string)}
 	<span style="color:orange"> custom parse error: {message} </span>
