@@ -1,15 +1,15 @@
 {
 	"name": "svelte-runtime-template",
-	"version": "0.0.2",
+	"version": "1.0.0",
 	"keywords": [
-    "typescript",
-    "template",
-    "parser",
-    "svelte",
+		"typescript",
+		"template",
+		"parser",
+		"svelte",
 		"runtime",
-    "utility"
-  ],
-  "author": "Andrej Vckovski",
+		"utility"
+	],
+	"author": "Andrej Vckovski",
 	"organization": "lufium gmbh",
 	"license": "MIT",
 	"scripts": {
