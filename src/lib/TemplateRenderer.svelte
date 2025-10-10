@@ -1,3 +1,10 @@
+<script lang="ts" module>
+	// this is needed to make the component work in sveltekit
+	// see https://svelte.dev/docs/kit/components#context
+
+export {defaultErrorReplacer, defaultTextReplacer} 
+</script>
+
 <script lang="ts" generics="T extends Values">
 	import { parseTemplate, type ParseResultLine, type Schema, type Values } from './parser.js'
 	import type { Snippet } from 'svelte'
